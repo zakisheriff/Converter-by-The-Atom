@@ -116,6 +116,7 @@ export default function ConversionCard({ fileItem, onRemove, onComplete, activeA
   const [advValues, setAdvValues] = useState({});
   const [jobState, setJobState] = useState(null); // null | { status, progress, error, downloadUrl }
   const pollRef = useRef(null);
+  const progressIntervalRef = useRef(null);
 
   // Auto-set target formats for specific quick actions
   useEffect(() => {
@@ -135,16 +136,52 @@ export default function ConversionCard({ fileItem, onRemove, onComplete, activeA
     }
   }, [activeAction, targets]);
 
+  const startProgressSimulation = useCallback((initialProgress, targetProgress, speed = 0.5) => {
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    
+    let currentProgress = initialProgress;
+    setJobState((prev) => ({
+      ...prev,
+      progress: initialProgress
+    }));
+
+    progressIntervalRef.current = setInterval(() => {
+      if (currentProgress < targetProgress) {
+        // Asymptotically slow down as we approach the target
+        const remaining = targetProgress - currentProgress;
+        const step = Math.max(0.1, remaining * 0.05 * speed);
+        currentProgress += step;
+        
+        setJobState((prev) => {
+          if (!prev || prev.status === "done" || prev.status === "error") {
+            if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+            return prev;
+          }
+          return {
+            ...prev,
+            progress: Math.min(currentProgress, targetProgress)
+          };
+        });
+      } else {
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+      }
+    }, 50); // 20 frames per second for smooth movement
+  }, []);
+
   // Cleanup polling on unmount
   useEffect(() => {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     };
   }, []);
 
   const pollStatus = useCallback(
     (statusUrl) => {
       if (pollRef.current) clearInterval(pollRef.current);
+
+      // Start simulating conversion progress from 30% to 95%
+      startProgressSimulation(30, 95, 0.15);
 
       pollRef.current = setInterval(async () => {
         try {
@@ -155,6 +192,7 @@ export default function ConversionCard({ fileItem, onRemove, onComplete, activeA
           if (data.status === "done") {
             clearInterval(pollRef.current);
             pollRef.current = null;
+            if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
             setJobState({
               status: "done",
               progress: 100,
@@ -164,38 +202,32 @@ export default function ConversionCard({ fileItem, onRemove, onComplete, activeA
           } else if (data.status === "error") {
             clearInterval(pollRef.current);
             pollRef.current = null;
+            if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
             setJobState({
               status: "error",
               progress: 0,
               error: data.error || "Conversion failed",
             });
-          } else {
-            // Still processing — animate progress
-            setJobState((prev) => ({
-              status: "converting",
-              progress: Math.min((prev?.progress || 30) + 5, 90),
-            }));
           }
         } catch {
           // ignore polling errors
         }
       }, 1500);
     },
-    [onComplete],
+    [onComplete, startProgressSimulation],
   );
 
   const handleConvert = useCallback(async () => {
     if (!targetFormat || !file) return;
 
-    setJobState({ status: "uploading", progress: 10 });
+    setJobState({ status: "uploading", progress: 0 });
+    startProgressSimulation(0, 30, 0.4);
 
     try {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("targetFormat", targetFormat);
       formData.append("options", JSON.stringify(advValues));
-
-      setJobState({ status: "converting", progress: 30 });
 
       const res = await fetch("/api/convert", {
         method: "POST",
@@ -211,6 +243,7 @@ export default function ConversionCard({ fileItem, onRemove, onComplete, activeA
 
       // If the server returned a downloadUrl directly (sync mode)
       if (data.downloadUrl && !data.statusUrl) {
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
         setJobState({
           status: "done",
           progress: 100,
@@ -222,21 +255,27 @@ export default function ConversionCard({ fileItem, onRemove, onComplete, activeA
 
       // Otherwise poll for status
       if (data.statusUrl) {
+        setJobState((prev) => ({ ...prev, status: "converting" }));
         pollStatus(data.statusUrl);
       }
     } catch (err) {
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
       setJobState({
         status: "error",
         progress: 0,
         error: err.message || "Conversion failed",
       });
     }
-  }, [file, targetFormat, advValues, onComplete, pollStatus]);
+  }, [file, targetFormat, advValues, onComplete, pollStatus, startProgressSimulation]);
 
   const handleReset = () => {
     if (pollRef.current) {
       clearInterval(pollRef.current);
       pollRef.current = null;
+    }
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
     }
     setJobState(null);
   };

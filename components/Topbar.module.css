@@ -1,0 +1,116 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px 18px;
+  background: rgba(245, 245, 241, 0.82);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(12, 12, 12, 0.08);
+  border-radius: 35px;
+}
+
+.titleBlock {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.titleBlock strong {
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.titleBlock span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.coffeeBtnGlass {
+  --glass-surface-background: rgba(245, 200, 66, 0.9) !important;
+  --glass-tint: rgba(212, 150, 10, 0.15) !important;
+  color: #3d2000 !important;
+  font-weight: 700 !important;
+  white-space: nowrap;
+  border-radius: 35px !important;
+}
+
+.coffeeBtnGlass,
+.coffeeBtnGlass * {
+  color: #3d2000 !important;
+}
+
+.coffeeBtnGlass svg {
+  opacity: 0.85;
+}
+
+.mobileMenuButtonGlass {
+  display: none !important;
+  color: var(--text) !important;
+  border-radius: 35px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+}
+
+.mobileMenuButtonGlass :global(.lg-content) {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+@media (max-width: 960px) {
+  .mobileMenuButtonGlass {
+    display: inline-flex !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    padding: 14px 14px 16px;
+  }
+
+  .titleBlock span {
+    font-size: 0.84rem;
+  }
+
+  .coffeeBtnGlass span {
+    display: none !important;
+  }
+
+  .coffeeBtnGlass {
+    min-width: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    border-radius: 50% !important;
+  }
+
+  .coffeeBtnGlass :global(.lg-content) {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}

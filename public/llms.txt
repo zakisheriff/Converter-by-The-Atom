@@ -1,0 +1,18 @@
+# Converter by The Atom
+
+Converter by The Atom (https://converter.theatom.lk) is a free, fast, and secure online file converter supporting over 200+ formats across documents, images, video, audio, ebooks, archives, and CAD/vectors. It runs completely free with no registration, no file counts limits, and no ads.
+
+## Key Capabilities
+
+- **General Conversion**: Inter-convert documents, images, videos, audio, and archives between 200+ formats using industry-standard tools (FFmpeg, LibreOffice, ImageMagick).
+- **PDF Tools**: Merge PDFs, compress files (reducing image size/density), convert PDF to Word or Images, split pages, and password protect documents.
+- **Image Tools**: Convert formats (HEIC, WEBP, PNG, JPG, RAW etc.), resize (custom width/height), compress (quality adjustments), crop, optimize (strip metadata), and add watermarks.
+- **Video Tools**: Modify video codecs (H.264, H.265, VP9, AV1), adjust video/audio bitrates, change resolutions, extract audio tracks, trim clips, and extract video frames to image thumbnails.
+- **Audio Tools**: Convert audio files, adjust channels (stereo/mono), sample rates, and bitrates.
+- **Archive Tools**: Compress and decompress files to ZIP, TAR, GZ, 7Z, RAR, and BZ2 formats.
+- **Website Capture**: Capture high-fidelity full-page screenshots of any website as PDF, PNG, or JPG via headless browser rendering.
+
+## Integration & Hosting
+
+- **Frontend**: Built using Next.js, Manrope typography, and Glassmorphism design tokens (powered by @zakisheriff/liquid-glass).
+- **Backend processing**: Conversions run securely on the server-side, with temporary directories isolated and automatically cleaned up post-conversion.

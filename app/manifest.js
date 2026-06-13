@@ -10,7 +10,7 @@ export default function manifest() {
     theme_color: "#f5f5f1",
     icons: [
       {
-        src: "/Logo.png",
+        src: "/converter-logo.png",
         sizes: "512x512",
         type: "image/png",
       },

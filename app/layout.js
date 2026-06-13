@@ -46,11 +46,10 @@ export const metadata = {
   alternates: { canonical: "/" },
   icons: {
     icon: [
-      { url: "/Logo.png", type: "image/png" },
-      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+      { url: "/converter-logo.png", type: "image/png" },
     ],
-    shortcut: ["/Logo.png"],
-    apple: [{ url: "/apple-icon.png", sizes: "512x512", type: "image/png" }],
+    shortcut: ["/converter-logo.png"],
+    apple: [{ url: "/converter-logo.png", sizes: "512x512", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
   openGraph: {
@@ -62,7 +61,7 @@ export const metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/Logo.png",
+        url: "/converter-logo.png",
         width: 1200,
         height: 630,
         alt: "Converter by The Atom",
@@ -74,7 +73,7 @@ export const metadata = {
     title: siteTitle,
     description: siteDescription,
     creator: "@theoneatom",
-    images: ["/Logo.png"],
+    images: ["/converter-logo.png"],
   },
   robots: {
     index: true,

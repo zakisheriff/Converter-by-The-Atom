@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -32,6 +33,21 @@ const navigation = [
 export default function Sidebar({ mobileOpen, onClose, hideDesktop = false }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  // Lock body scroll on mobile open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   const content = (
     <div className={styles.sidebar}>
@@ -119,16 +135,14 @@ export default function Sidebar({ mobileOpen, onClose, hideDesktop = false }) {
       {!hideDesktop ? (
         <aside className={styles.desktop}>{content}</aside>
       ) : null}
-      {mobileOpen ? (
-        <div className={styles.mobileWrap}>
-          <button
-            className={styles.backdrop}
-            onClick={onClose}
-            aria-label="Close sidebar"
-          />
-          <div className={styles.mobile}>{content}</div>
-        </div>
-      ) : null}
+      <div className={`${styles.mobileWrap} ${mobileOpen ? styles.mobileWrapOpen : ""}`}>
+        <button
+          className={styles.backdrop}
+          onClick={onClose}
+          aria-label="Close sidebar"
+        />
+        <div className={`${styles.mobile} ${mobileOpen ? styles.mobileOpen : ""}`}>{content}</div>
+      </div>
     </>
   );
 }

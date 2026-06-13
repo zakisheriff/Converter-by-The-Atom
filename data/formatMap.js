@@ -80,7 +80,7 @@ export const formatCategories = {
       { ext: "pgm", mime: "image/x-portable-graymap", label: "PGM" },
       { ext: "ppm", mime: "image/x-portable-pixmap", label: "PPM" },
     ],
-    targets: ["png", "jpg", "webp", "gif", "bmp", "tiff", "svg", "ico", "heic", "avif", "eps"]
+    targets: ["png", "jpg", "jpeg", "webp", "gif", "bmp", "tiff", "svg", "ico", "heic", "avif", "eps"]
   },
   video: {
     label: "Videos",
@@ -102,7 +102,7 @@ export const formatCategories = {
       { ext: "vob", mime: "video/dvd", label: "VOB" },
       { ext: "mts", mime: "video/mp2t", label: "MTS" },
     ],
-    targets: ["mp4", "mov", "mkv", "avi", "webm", "flv", "wmv", "m4v", "mpeg", "3gp", "ogv", "gif", "jpg", "png", "webp"]
+    targets: ["mp4", "mov", "mkv", "avi", "webm", "flv", "wmv", "m4v", "mpeg", "3gp", "ogv", "gif", "jpg", "jpeg", "png", "webp"]
   },
   audio: {
     label: "Audio",
@@ -149,7 +149,7 @@ export const formatCategories = {
       { ext: "dxf", mime: "application/dxf", label: "DXF" },
       { ext: "dwg", mime: "application/acad", label: "DWG" },
     ],
-    targets: ["svg", "eps", "png", "jpg", "pdf"]
+    targets: ["svg", "eps", "png", "jpg", "jpeg", "pdf"]
   }
 };
 

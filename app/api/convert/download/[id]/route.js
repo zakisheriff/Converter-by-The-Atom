@@ -36,6 +36,31 @@ export async function GET(request, { params }) {
     return NextResponse.json({ error: "Missing job ID" }, { status: 400 });
   }
 
+  const backendUrl = process.env.CONVERSION_BACKEND_URL;
+  if (backendUrl) {
+    try {
+      const url = new URL(request.url);
+      const targetUrl = `${backendUrl.replace(/\/$/, "")}${url.pathname}${url.search}`;
+      const response = await fetch(targetUrl, {
+        method: "GET"
+      });
+      if (!response.ok) {
+        return NextResponse.json({ error: "Backend error: " + response.statusText }, { status: response.status });
+      }
+      const buffer = await response.arrayBuffer();
+      const headers = new Headers();
+      headers.set("Content-Type", response.headers.get("Content-Type") || "application/octet-stream");
+      headers.set("Content-Disposition", response.headers.get("Content-Disposition") || "attachment");
+      headers.set("Content-Length", String(buffer.byteLength));
+      return new NextResponse(Buffer.from(buffer), {
+        status: 200,
+        headers
+      });
+    } catch (err) {
+      return NextResponse.json({ error: "Backend proxy error: " + err.message }, { status: 502 });
+    }
+  }
+
   const job = getJob(id);
 
   if (!job) {

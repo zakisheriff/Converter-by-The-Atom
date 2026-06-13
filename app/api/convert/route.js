@@ -5,6 +5,23 @@ import { generateJobId } from "@/utils/server/fileHelpers";
 import { basename } from "path";
 
 export async function POST(request) {
+  const backendUrl = process.env.CONVERSION_BACKEND_URL;
+  if (backendUrl) {
+    try {
+      const url = new URL(request.url);
+      const targetUrl = `${backendUrl.replace(/\/$/, "")}${url.pathname}${url.search}`;
+      const body = await request.formData();
+      const response = await fetch(targetUrl, {
+        method: "POST",
+        body
+      });
+      const data = await response.json();
+      return NextResponse.json(data, { status: response.status });
+    } catch (err) {
+      return NextResponse.json({ error: "Backend proxy error: " + err.message }, { status: 502 });
+    }
+  }
+
   try {
     const formData = await request.formData();
     const file = formData.get("file");

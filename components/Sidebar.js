@@ -53,29 +53,26 @@ export default function Sidebar({ mobileOpen, onClose, hideDesktop = false }) {
     <div className={styles.sidebar}>
       <div className={styles.logoRow}>
         <Link href="/" className={styles.logo} onClick={onClose}>
+          <img
+            src="/converter-logo.png"
+            alt="Converter by The Atom Logo"
+            className={styles.logoImg}
+          />
           <div className={styles.logoCopy}>
             <strong>Go Home</strong>
             <small>converter.theatom.lk</small>
           </div>
         </Link>
-        <GlassButton
-          className={styles.closeMobileGlass}
+        <button
+          className={styles.closeMobileButton}
           onClick={(e) => {
             e.stopPropagation();
             onClose();
           }}
-          size="md"
-          intensity={6}
           aria-label="Close menu"
-          style={{
-            width: "38px",
-            height: "38px",
-            borderRadius: "50%",
-            padding: 0
-          }}
         >
           <X size={18} />
-        </GlassButton>
+        </button>
       </div>
 
       <nav className={styles.nav}>

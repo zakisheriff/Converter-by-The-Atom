@@ -10,7 +10,7 @@ const siteUrl = "https://converter.theatom.lk";
 const siteTitle =
   "Converter by The Atom — Free Online File Converter for 200+ Formats";
 const siteDescription =
-  "Convert documents, images, videos, audio, ebooks, archives, and more between 200+ formats. Free, no sign-up, no ads. Powered by FFmpeg, LibreOffice, and ImageMagick.";
+  "The fastest free online file converter. Convert documents, PDFs, images, videos, audio, and archives between 200+ formats instantly — no sign‑up, no ads, no limits. Secure and powered by FFmpeg, LibreOffice, and ImageMagick.";
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
@@ -21,22 +21,66 @@ export const metadata = {
   },
   description: siteDescription,
   keywords: [
+    // Brand
     "Converter by The Atom",
     "The Atom converter",
-    "online file converter",
-    "free file converter",
-    "PDF converter",
-    "image converter",
-    "video converter",
-    "audio converter",
-    "document converter",
-    "HEIC converter",
-    "WEBP converter",
-    "MP4 converter",
-    "MP3 converter",
-    "cloud convert alternative",
-    "convert files online free",
-    "200+ format converter",
+    "theatom converter",
+    "converter theatom lk",
+    "Sri Lanka file converter",
+    "best free file converter",
+    // Documents & PDF
+    "free PDF converter online",
+    "Word to PDF converter",
+    "convert Word to PDF free",
+    "merge PDF files online",
+    "compress PDF online free",
+    "convert PDF to Word",
+    "PDF to JPG converter",
+    "EPUB to PDF converter",
+    "PDF editor tools free",
+    "split PDF online",
+    // Images
+    "HEIC to JPG converter",
+    "convert HEIC to JPG free",
+    "WEBP converter online",
+    "convert PNG to WEBP",
+    "convert JPG to PNG",
+    "resize image online free",
+    "compress images without losing quality",
+    "SVG converter online",
+    "GIF maker and converter",
+    "convert HEIC to PNG",
+    // Videos & Audio
+    "video to audio converter",
+    "convert MP4 to MP3",
+    "MOV to MP4 converter free",
+    "convert video to MP4 online",
+    "MP3 converter online",
+    "convert WAV to MP3 free",
+    "extract audio from video",
+    "M4A to MP3 converter",
+    "audio converter online free",
+    "MKV to MP4 converter",
+    // Archives & Compression
+    "ZIP file maker online",
+    "unzip files online free",
+    "convert ZIP to TAR",
+    "7Z to ZIP converter",
+    "extract RAR files online",
+    // Website Capture
+    "website to PDF converter",
+    "capture webpage to PNG",
+    "save webpage as PDF link",
+    "webpage screenshot tool online",
+    // Generic & SEO
+    "free file converter online no ads",
+    "convert files online no signup",
+    "cloud convert alternative free",
+    "safe online file converter",
+    "batch file converter online",
+    "best free file converter 2024",
+    "best free file converter 2025",
+    "convert file from URL"
   ],
   authors: [{ name: "The Atom", url: "https://theatom.lk" }],
   creator: "The Atom",
@@ -64,7 +108,7 @@ export const metadata = {
         url: "/converter-logo.png",
         width: 1200,
         height: 630,
-        alt: "Converter by The Atom",
+        alt: "Converter by The Atom — Free online file converter for documents, images, video and audio",
       },
     ],
   },

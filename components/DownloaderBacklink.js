@@ -19,7 +19,6 @@ export default function DownloaderBacklink({ type = "general" }) {
   return (
     <GlassCard className={styles.backlinkCard}>
       <div className={styles.content}>
-        <div className={styles.badge}>Downloader</div>
         <p className={styles.text}>
           {text}
         </p>

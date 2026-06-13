@@ -23,7 +23,7 @@
 .inputCardContent {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 14px;
+  gap: 24px;
   padding: 14px;
   align-items: center;
 }
@@ -33,7 +33,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 10px;
+  padding: 0 16px 0 10px;
   flex: 1;
 }
 
@@ -177,4 +177,24 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .inputCardContent {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    gap: 12px;
+  }
+  
+  .inputWrap {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 8px;
+  }
+
+  .captureBtn {
+    width: 100%;
+    min-height: 52px;
+    min-width: 0;
+  }
 }

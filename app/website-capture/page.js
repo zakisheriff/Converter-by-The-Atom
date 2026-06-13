@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Globe, Download, Loader2, Camera } from "lucide-react";
+import { Globe, Download, Loader2, Camera, Check, Clipboard, Copy, X } from "lucide-react";
 import {
   LiquidGlassFilter,
   GlassButton,
@@ -53,14 +53,48 @@ export default function WebsiteCapturePage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const copyTimeoutRef = useRef(null);
+  const inputRef = useRef(null);
 
   const pollRef = useRef(null);
 
   useEffect(() => {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
     };
   }, []);
+
+  const handleContainerClick = (e) => {
+    if (e.target.tagName !== "BUTTON" && !e.target.closest("button")) {
+      inputRef.current?.focus();
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!url.trim()) return;
+    try {
+      await navigator.clipboard.writeText(url.trim());
+      setCopied(true);
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => setCopied(false), 1500);
+    } catch { /* ignore */ }
+  };
+
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const trimmedText = (text || "").trim();
+      if (trimmedText) {
+        setUrl(trimmedText);
+      }
+    } catch (err) {
+      console.error("Failed to read clipboard contents: ", err);
+    }
+  };
+
+  const handleClear = () => setUrl("");
 
   const handleCapture = async () => {
     if (!url.trim()) return;
@@ -125,56 +159,105 @@ export default function WebsiteCapturePage() {
               Enter a URL below to get started.
             </p>
 
-            <CustomGlassInputCard className={styles.inputCard}>
-              <div className={styles.inputRow}>
-                <div className={styles.inputIcon}>
-                  <Globe size={18} />
-                </div>
+            <CustomGlassInputCard className={styles.inputCard} onClick={handleContainerClick}>
+              <div className={styles.inputWrap}>
+                <Globe size={18} className={styles.inputIcon} />
                 <input
+                  ref={inputRef}
                   type="url"
-                  placeholder="https://example.com"
+                  placeholder="Paste URL (e.g. https://example.com) to capture..."
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className={styles.urlInput}
                   onKeyDown={(e) => e.key === "Enter" && handleCapture()}
+                  className={styles.urlInput}
                 />
-              </div>
-
-              <div className={styles.formatRow}>
-                {formatOptions.map((opt) => (
-                  <button
-                    key={opt.value}
+                {url ? (
+                  <>
+                    <GlassButton
+                      className={styles.iconBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopy();
+                      }}
+                      title={copied ? "Copied!" : "Copy link"}
+                      aria-label="Copy link"
+                      type="button"
+                      variant="ghost"
+                      intensity={4}
+                      size="sm"
+                      style={{ minWidth: "32px", width: "32px", height: "32px", borderRadius: "50%", padding: 0 }}
+                    >
+                      {copied ? <Check size={14} /> : <Copy size={14} />}
+                    </GlassButton>
+                    <GlassButton
+                      className={styles.iconBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleClear();
+                      }}
+                      title="Clear"
+                      aria-label="Clear input"
+                      type="button"
+                      variant="ghost"
+                      intensity={4}
+                      size="sm"
+                      style={{ minWidth: "32px", width: "32px", height: "32px", borderRadius: "50%", padding: 0 }}
+                    >
+                      <X size={14} />
+                    </GlassButton>
+                  </>
+                ) : (
+                  <GlassButton
+                    className={styles.iconBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePaste();
+                    }}
+                    title="Paste from clipboard"
+                    aria-label="Paste from clipboard"
                     type="button"
-                    className={`${styles.formatChip} ${format === opt.value ? styles.formatChipActive : ""}`}
-                    onClick={() => setFormat(opt.value)}
+                    variant="ghost"
+                    intensity={4}
+                    size="sm"
+                    style={{ minWidth: "32px", width: "32px", height: "32px", borderRadius: "50%", padding: 0 }}
                   >
-                    {opt.label}
-                  </button>
-                ))}
+                    <Clipboard size={14} />
+                  </GlassButton>
+                )}
               </div>
-
-              <div className={styles.btnRow}>
-                <GlassButton
-                  onClick={handleCapture}
-                  size="lg"
-                  intensity={6}
-                  disabled={loading || !url.trim()}
-                  className={styles.captureBtn}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 size={16} className={styles.spin} />
-                      Capturing…
-                    </>
-                  ) : (
-                    <>
-                      <Camera size={16} />
-                      Capture
-                    </>
-                  )}
-                </GlassButton>
-              </div>
+              <GlassButton
+                onClick={handleCapture}
+                size="lg"
+                intensity={6}
+                disabled={loading || !url.trim()}
+                className={styles.captureBtn}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 size={16} className={styles.spin} />
+                    Capturing…
+                  </>
+                ) : (
+                  <>
+                    <Camera size={16} />
+                    Capture
+                  </>
+                )}
+              </GlassButton>
             </CustomGlassInputCard>
+
+            <div className={styles.formatRow}>
+              {formatOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  className={`${styles.formatChip} ${format === opt.value ? styles.formatChipActive : ""}`}
+                  onClick={() => setFormat(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
 
             {error && (
               <GlassCard className={styles.errorCard}>

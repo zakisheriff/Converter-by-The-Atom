@@ -106,7 +106,7 @@ function formatSize(bytes) {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
-export default function ConversionCard({ fileItem, onRemove, onComplete }) {
+export default function ConversionCard({ fileItem, onRemove, onComplete, activeAction }) {
   const { file, name, size, ext } = fileItem;
   const Icon = getFileIcon(ext);
   const categoryKey = getCategoryForExt(ext);
@@ -116,6 +116,24 @@ export default function ConversionCard({ fileItem, onRemove, onComplete }) {
   const [advValues, setAdvValues] = useState({});
   const [jobState, setJobState] = useState(null); // null | { status, progress, error, downloadUrl }
   const pollRef = useRef(null);
+
+  // Auto-set target formats for specific quick actions
+  useEffect(() => {
+    if (activeAction === "audio") {
+      if (targets.includes("mp3")) {
+        setTargetFormat("mp3");
+      } else {
+        const audioTargets = targets.filter(t => ["mp3", "wav", "m4a", "flac", "ogg"].includes(t));
+        if (audioTargets.length > 0) setTargetFormat(audioTargets[0]);
+      }
+    } else if (activeAction === "thumbnail") {
+      if (targets.includes("jpg")) {
+        setTargetFormat("jpg");
+      } else if (targets.includes("png")) {
+        setTargetFormat("png");
+      }
+    }
+  }, [activeAction, targets]);
 
   // Cleanup polling on unmount
   useEffect(() => {
@@ -317,6 +335,7 @@ export default function ConversionCard({ fileItem, onRemove, onComplete }) {
             categoryKey={categoryKey}
             values={advValues}
             onChange={setAdvValues}
+            activeAction={activeAction}
           />
 
           <div className={styles.actions}>

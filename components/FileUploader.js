@@ -14,6 +14,7 @@ import {
 import { GlassButton } from "@zakisheriff/liquid-glass";
 import GlassCard from "@/components/GlassCard";
 import styles from "@/components/FileUploader.module.css";
+import { useToast } from "@/components/providers/ToastProvider";
 
 function getFileIcon(type, name) {
   if (type?.startsWith("image/")) return Image;
@@ -68,10 +69,32 @@ function formatSize(bytes) {
 export default function FileUploader({ files, onFilesChange, accept = "*/*" }) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+  const { showToast } = useToast();
 
   const addFiles = (newFiles) => {
     if (!newFiles || newFiles.length === 0) return;
-    const fileArray = Array.from(newFiles).map((f) => ({
+    let fileList = Array.from(newFiles);
+    
+    if (accept && accept !== "*/*") {
+      const allowedExts = accept.split(",").map(e => e.trim().toLowerCase());
+      fileList = fileList.filter(f => {
+        const ext = "." + f.name.split(".").pop().toLowerCase();
+        return allowedExts.includes(ext);
+      });
+      
+      const rejectedCount = newFiles.length - fileList.length;
+      if (rejectedCount > 0) {
+        showToast({
+          title: "Unsupported file format",
+          description: `${rejectedCount} file(s) ignored. Only formats matching "${accept}" are allowed.`,
+          variant: "warning"
+        });
+      }
+    }
+    
+    if (fileList.length === 0) return;
+    
+    const fileArray = fileList.map((f) => ({
       file: f,
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       name: f.name,

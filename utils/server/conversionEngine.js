@@ -95,6 +95,11 @@ async function convertImage(inputPath, targetExt, options = {}) {
     args.push("-resize", `${w}x${h}`);
   }
 
+  // Crop
+  if (options.crop) {
+    args.push("-crop", String(options.crop));
+  }
+
   // DPI
   if (options.dpi) {
     args.push("-density", String(options.dpi));
@@ -138,42 +143,63 @@ async function convertVideo(inputPath, targetExt, options = {}) {
   const dir = inputPath.replace(basename(inputPath), "");
   const outputPath = getOutputPath(dir, basename(inputPath), targetExt);
 
-  const args = ["-y", "-i", inputPath];
+  const args = ["-y"];
 
-  // Codec
-  if (options.codec && options.codec !== "auto") {
-    const codecMap = {
-      h264: "libx264",
-      h265: "libx265",
-      vp9: "libvpx-vp9",
-      av1: "libaom-av1",
-    };
-    args.push("-c:v", codecMap[options.codec] || options.codec);
+  // Seek / Trim start
+  if (options.trim_start) {
+    args.push("-ss", options.trim_start);
+  } else if (["jpg", "jpeg", "png", "webp"].includes(targetExt.toLowerCase())) {
+    // For image thumbnails, extract frame at 1s mark if no trim start is specified
+    args.push("-ss", "00:00:01");
   }
 
-  // Quality (CRF)
-  if (options.quality !== undefined && options.quality !== null) {
-    args.push("-crf", String(options.quality));
+  args.push("-i", inputPath);
+
+  // Trim duration
+  if (options.trim_duration) {
+    args.push("-t", String(options.trim_duration));
   }
 
-  // Bitrate
-  if (options.bitrate) {
-    args.push("-b:v", options.bitrate);
-  }
+  // If capturing a single frame thumbnail
+  const isImageTarget = ["jpg", "jpeg", "png", "webp"].includes(targetExt.toLowerCase());
+  if (isImageTarget) {
+    args.push("-vframes", "1");
+  } else {
+    // Codec
+    if (options.codec && options.codec !== "auto") {
+      const codecMap = {
+        h264: "libx264",
+        h265: "libx265",
+        vp9: "libvpx-vp9",
+        av1: "libaom-av1",
+      };
+      args.push("-c:v", codecMap[options.codec] || options.codec);
+    }
 
-  // Resolution
-  if (options.resolution && options.resolution !== "auto") {
-    args.push("-s", options.resolution);
-  }
+    // Quality (CRF)
+    if (options.quality !== undefined && options.quality !== null) {
+      args.push("-crf", String(options.quality));
+    }
 
-  // Frame rate
-  if (options.framerate && options.framerate !== "auto") {
-    args.push("-r", options.framerate);
-  }
+    // Bitrate
+    if (options.bitrate) {
+      args.push("-b:v", options.bitrate);
+    }
 
-  // Audio bitrate
-  if (options.audio_bitrate && options.audio_bitrate !== "auto") {
-    args.push("-b:a", options.audio_bitrate);
+    // Resolution
+    if (options.resolution && options.resolution !== "auto") {
+      args.push("-s", options.resolution);
+    }
+
+    // Frame rate
+    if (options.framerate && options.framerate !== "auto") {
+      args.push("-r", options.framerate);
+    }
+
+    // Audio bitrate
+    if (options.audio_bitrate && options.audio_bitrate !== "auto") {
+      args.push("-b:a", options.audio_bitrate);
+    }
   }
 
   args.push(outputPath);
@@ -448,41 +474,21 @@ export async function captureWebsite(url, format = "pdf", options = {}) {
   const outputPath = `${tempDir}/capture.${format}`;
 
   try {
-    // Try wkhtmltopdf for PDF
+    let apiUrl;
     if (format === "pdf") {
-      await runCommand("wkhtmltopdf", [
-        "--quiet",
-        "--page-size",
-        "A4",
-        "--margin-top",
-        "10mm",
-        "--margin-bottom",
-        "10mm",
-        "--margin-left",
-        "10mm",
-        "--margin-right",
-        "10mm",
-        "--javascript-delay",
-        "2000",
-        url,
-        outputPath,
-      ]);
+      apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&pdf=true&embed=pdf.url`;
     } else {
-      // For images, use wkhtmltoimage
-      await runCommand("wkhtmltoimage", [
-        "--quiet",
-        "--format",
-        format,
-        "--quality",
-        "90",
-        "--width",
-        "1280",
-        "--javascript-delay",
-        "2000",
-        url,
-        outputPath,
-      ]);
+      apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&embed=screenshot.url`;
     }
+
+    const res = await fetch(apiUrl);
+    if (!res.ok) {
+      throw new Error(`Failed to capture website: ${res.statusText}`);
+    }
+    const arrayBuffer = await res.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const { writeFile } = await import("fs/promises");
+    await writeFile(outputPath, buffer);
 
     return { outputPath, tempDir };
   } catch (err) {

@@ -15,25 +15,26 @@
 }
 
 .inputCard {
-  border-radius: 35px;
-  overflow: hidden;
+  width: 100%;
+  cursor: text;
+  border-radius: 24px;
 }
 
 .inputCardContent {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 14px;
+  align-items: center;
 }
 
-.inputRow {
+.inputWrap {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  border-radius: 20px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
+  padding: 0 10px;
+  flex: 1;
 }
 
 .inputIcon {
@@ -45,21 +46,48 @@
 
 .urlInput {
   flex: 1;
-  border: none;
-  background: none;
-  color: var(--text-primary);
-  font-size: 0.92rem;
+  border: 0 !important;
+  background: transparent !important;
+  outline: none !important;
+  font-size: 1.02rem;
   font-family: inherit;
-  outline: none;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  color: var(--text-primary);
 }
 
 .urlInput::placeholder {
   color: var(--text-tertiary);
 }
 
+.iconBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--text-tertiary) !important;
+  cursor: pointer;
+  transform: translateY(0);
+  transition: transform 0.1s ease, color 0.1s ease;
+}
+
+.iconBtn:hover {
+  color: var(--text-primary) !important;
+  transform: translateY(-1px);
+}
+
+.iconBtn:active {
+  transform: translateY(1px);
+}
+
 .formatRow {
   display: flex;
+  justify-content: center;
   gap: 8px;
+  margin-top: 8px;
 }
 
 .formatChip {
@@ -93,18 +121,14 @@
   border-color: var(--accent);
 }
 
-.btnRow {
-  display: flex;
-  justify-content: center;
-  padding-top: 4px;
-}
-
 .captureBtn {
-  display: flex;
+  font-weight: 700;
+  min-height: 52px;
+  min-width: 140px;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-width: 180px;
   justify-content: center;
+  gap: 8px;
 }
 
 .spin {

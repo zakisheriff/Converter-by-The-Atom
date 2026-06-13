@@ -74,17 +74,9 @@ export default function HeroSection() {
 
   const handleFiles = (files) => {
     if (!files || files.length === 0) return;
-    // Store files in sessionStorage for the convert page to pick up
-    const fileList = [];
-    for (let i = 0; i < files.length; i++) {
-      fileList.push({
-        name: files[i].name,
-        size: files[i].size,
-        type: files[i].type,
-      });
-    }
-    // We'll pass file count info via URL, actual files uploaded on convert page
-    router.push(`/convert?files=${files.length}`);
+    const { setPendingFiles } = require("@/utils/clientFileStore");
+    setPendingFiles(files);
+    router.push("/convert");
   };
 
   const handleDrop = (e) => {

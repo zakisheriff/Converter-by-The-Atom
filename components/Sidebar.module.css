@@ -69,17 +69,24 @@
 }
 
 .linkGlass.active {
-  color: var(--text) !important;
+  color: #7c3aed !important;
   font-weight: 600 !important;
+  --glass-surface-background: rgba(124, 58, 237, 0.08) !important;
+  --glass-border-color: rgba(124, 58, 237, 0.25) !important;
+  --glass-tint: rgba(124, 58, 237, 0.1) !important;
 }
 
 .linkGlass svg {
   color: var(--muted) !important;
+  transition: color 0.15s ease;
 }
 
-.linkGlass:hover svg,
-.linkGlass.active svg {
+.linkGlass:hover svg {
   color: var(--text) !important;
+}
+
+.linkGlass.active svg {
+  color: #7c3aed !important;
 }
 
 .coffeeLinkGlass {

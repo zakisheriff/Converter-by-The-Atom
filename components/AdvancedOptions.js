@@ -1,13 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, Settings2 } from "lucide-react";
 import { advancedOptions } from "@/data/formatMap";
 import styles from "@/components/AdvancedOptions.module.css";
 
-export default function AdvancedOptions({ categoryKey, values, onChange }) {
+const actionFieldMapping = {
+  resize: ["resize_width", "resize_height"],
+  compress: ["quality"],
+  watermark: ["watermark_text"],
+  text: ["watermark_text"],
+  crop: ["crop"],
+  optimize: ["quality", "strip_metadata"],
+  
+  codec: ["codec"],
+  bitrate: ["bitrate"],
+  audio: ["codec", "bitrate", "sample_rate", "channels"],
+  resolution: ["resolution"],
+  trim: ["trim_start", "trim_duration"]
+};
+
+export default function AdvancedOptions({ categoryKey, values, onChange, activeAction }) {
   const [open, setOpen] = useState(false);
   const schema = advancedOptions[categoryKey];
+
+  useEffect(() => {
+    if (activeAction && actionFieldMapping[activeAction]) {
+      const isRelevant = actionFieldMapping[activeAction].some(key => 
+        schema?.some(opt => opt.key === key)
+      );
+      if (isRelevant) {
+        setOpen(true);
+      }
+    }
+  }, [activeAction, schema]);
 
   if (!schema || schema.length === 0) return null;
 
@@ -32,9 +58,14 @@ export default function AdvancedOptions({ categoryKey, values, onChange }) {
 
       {open && (
         <div className={styles.panel}>
-          {schema.map((opt) => (
-            <div key={opt.key} className={styles.field}>
-              <label className={styles.fieldLabel}>{opt.label}</label>
+          {schema.map((opt) => {
+            const isHighlighted = activeAction && 
+              actionFieldMapping[activeAction] && 
+              actionFieldMapping[activeAction].includes(opt.key);
+            
+            return (
+              <div key={opt.key} className={`${styles.field} ${isHighlighted ? styles.highlightedField : ""}`}>
+                <label className={styles.fieldLabel}>{opt.label}</label>
 
               {opt.type === "range" && (
                 <div className={styles.rangeRow}>
@@ -108,8 +139,9 @@ export default function AdvancedOptions({ categoryKey, values, onChange }) {
                 </label>
               )}
             </div>
-          ))}
-        </div>
+          );
+        })}
+      </div>
       )}
     </div>
   );

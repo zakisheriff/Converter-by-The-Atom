@@ -102,7 +102,7 @@ export const formatCategories = {
       { ext: "vob", mime: "video/dvd", label: "VOB" },
       { ext: "mts", mime: "video/mp2t", label: "MTS" },
     ],
-    targets: ["mp4", "mov", "mkv", "avi", "webm", "flv", "wmv", "m4v", "mpeg", "3gp", "ogv"]
+    targets: ["mp4", "mov", "mkv", "avi", "webm", "flv", "wmv", "m4v", "mpeg", "3gp", "ogv", "gif", "jpg", "png", "webp"]
   },
   audio: {
     label: "Audio",
@@ -197,6 +197,7 @@ export const advancedOptions = {
     { key: "quality", label: "Quality", type: "range", min: 1, max: 100, default: 85, unit: "%" },
     { key: "resize_width", label: "Width", type: "number", placeholder: "Auto", unit: "px" },
     { key: "resize_height", label: "Height", type: "number", placeholder: "Auto", unit: "px" },
+    { key: "crop", label: "Crop geometry (e.g. 100x100+10+10)", type: "text", placeholder: "widthxheight+x+y" },
     { key: "dpi", label: "DPI", type: "number", placeholder: "72", unit: "dpi" },
     { key: "watermark_text", label: "Watermark text", type: "text", placeholder: "None" },
     { key: "strip_metadata", label: "Strip metadata", type: "boolean", default: false },
@@ -208,6 +209,8 @@ export const advancedOptions = {
     { key: "resolution", label: "Resolution", type: "select", options: ["auto", "3840x2160", "1920x1080", "1280x720", "854x480", "640x360"], default: "auto" },
     { key: "framerate", label: "Frame rate", type: "select", options: ["auto", "60", "30", "24", "15"], default: "auto" },
     { key: "audio_bitrate", label: "Audio bitrate", type: "select", options: ["auto", "320k", "256k", "192k", "128k", "96k"], default: "auto" },
+    { key: "trim_start", label: "Trim start time", type: "text", placeholder: "e.g. 00:00:05 or seconds" },
+    { key: "trim_duration", label: "Trim duration (seconds)", type: "number", placeholder: "e.g. 10" },
   ],
   audio: [
     { key: "codec", label: "Codec", type: "select", options: ["auto", "libmp3lame", "aac", "flac", "libvorbis", "libopus"], default: "auto" },

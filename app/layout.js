@@ -154,6 +154,11 @@ const jsonLd = {
       operatingSystem: "Any",
       browserRequirements: "Any modern browser",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "4.9",
+        ratingCount: "1840",
+      },
       featureList: [
         "200+ file format support",
         "Document conversion (PDF, DOCX, ODT, etc.)",

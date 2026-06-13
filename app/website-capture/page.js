@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Globe, Download, Loader2, Camera } from "lucide-react";
 import {
   LiquidGlassFilter,
@@ -54,6 +54,14 @@ export default function WebsiteCapturePage() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  const pollRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
+
   const handleCapture = async () => {
     if (!url.trim()) return;
     setLoading(true);
@@ -73,10 +81,36 @@ export default function WebsiteCapturePage() {
       }
 
       const data = await res.json();
-      setResult(data);
+
+      // Poll for status
+      if (data.statusUrl) {
+        pollRef.current = setInterval(async () => {
+          try {
+            const sRes = await fetch(data.statusUrl);
+            if (!sRes.ok) return;
+            const sData = await sRes.json();
+
+            if (sData.status === "done") {
+              clearInterval(pollRef.current);
+              pollRef.current = null;
+              setLoading(false);
+              setResult({ downloadUrl: sData.downloadUrl });
+            } else if (sData.status === "error") {
+              clearInterval(pollRef.current);
+              pollRef.current = null;
+              setLoading(false);
+              setError(sData.error || "Capture failed");
+            }
+          } catch {
+            // ignore
+          }
+        }, 1500);
+      } else if (data.downloadUrl) {
+        setResult({ downloadUrl: data.downloadUrl });
+        setLoading(false);
+      }
     } catch (err) {
       setError(err.message || "Capture failed");
-    } finally {
       setLoading(false);
     }
   };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import {
   ArrowRight,
   Download,
@@ -115,11 +115,61 @@ export default function ConversionCard({ fileItem, onRemove, onComplete }) {
   const [targetFormat, setTargetFormat] = useState(targets[0] || "");
   const [advValues, setAdvValues] = useState({});
   const [jobState, setJobState] = useState(null); // null | { status, progress, error, downloadUrl }
+  const pollRef = useRef(null);
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
+
+  const pollStatus = useCallback(
+    (statusUrl) => {
+      if (pollRef.current) clearInterval(pollRef.current);
+
+      pollRef.current = setInterval(async () => {
+        try {
+          const res = await fetch(statusUrl);
+          if (!res.ok) return;
+          const data = await res.json();
+
+          if (data.status === "done") {
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+            setJobState({
+              status: "done",
+              progress: 100,
+              downloadUrl: data.downloadUrl,
+            });
+            if (onComplete) onComplete(data);
+          } else if (data.status === "error") {
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+            setJobState({
+              status: "error",
+              progress: 0,
+              error: data.error || "Conversion failed",
+            });
+          } else {
+            // Still processing — animate progress
+            setJobState((prev) => ({
+              status: "converting",
+              progress: Math.min((prev?.progress || 30) + 5, 90),
+            }));
+          }
+        } catch {
+          // ignore polling errors
+        }
+      }, 1500);
+    },
+    [onComplete],
+  );
 
   const handleConvert = useCallback(async () => {
     if (!targetFormat || !file) return;
 
-    setJobState({ status: "uploading", progress: 0 });
+    setJobState({ status: "uploading", progress: 10 });
 
     try {
       const formData = new FormData();
@@ -140,13 +190,22 @@ export default function ConversionCard({ fileItem, onRemove, onComplete }) {
       }
 
       const data = await res.json();
-      setJobState({
-        status: "done",
-        progress: 100,
-        downloadUrl: data.downloadUrl,
-      });
 
-      if (onComplete) onComplete(data);
+      // If the server returned a downloadUrl directly (sync mode)
+      if (data.downloadUrl && !data.statusUrl) {
+        setJobState({
+          status: "done",
+          progress: 100,
+          downloadUrl: data.downloadUrl,
+        });
+        if (onComplete) onComplete(data);
+        return;
+      }
+
+      // Otherwise poll for status
+      if (data.statusUrl) {
+        pollStatus(data.statusUrl);
+      }
     } catch (err) {
       setJobState({
         status: "error",
@@ -154,9 +213,13 @@ export default function ConversionCard({ fileItem, onRemove, onComplete }) {
         error: err.message || "Conversion failed",
       });
     }
-  }, [file, targetFormat, advValues, onComplete]);
+  }, [file, targetFormat, advValues, onComplete, pollStatus]);
 
   const handleReset = () => {
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
     setJobState(null);
   };
 

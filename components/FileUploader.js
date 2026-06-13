@@ -65,7 +65,7 @@ function formatSize(bytes) {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
-export default function FileUploader({ files, onFilesChange }) {
+export default function FileUploader({ files, onFilesChange, accept = "*/*" }) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -121,7 +121,7 @@ export default function FileUploader({ files, onFilesChange }) {
           multiple
           className={styles.hiddenInput}
           onChange={handleFileInput}
-          accept="*/*"
+          accept={accept}
         />
         <div className={styles.dropIcon}>
           <Upload size={28} />

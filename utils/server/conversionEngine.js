@@ -57,6 +57,49 @@ function parseFfmpegProgress(text) {
 async function convertDocument(inputPath, targetExt, options = {}) {
   const dir = basename(inputPath).replace(/\.[^.]+$/, "");
   const outDir = inputPath.replace(basename(inputPath), "");
+  const srcExt = extname(inputPath).toLowerCase().replace(".", "");
+
+  if (srcExt === "pdf" && (targetExt === "txt" || targetExt === "md")) {
+    const { readFile, writeFile } = await import("fs/promises");
+    const pdfBuffer = await readFile(inputPath);
+    const pdfParse = (await import("pdf-parse")).default;
+    const data = await pdfParse(pdfBuffer);
+    
+    let resultText = data.text;
+    
+    // Normalize text layout/newlines slightly
+    if (targetExt === "md") {
+      const lines = resultText.split("\n");
+      const formattedLines = [];
+      let lastLineEmpty = false;
+      
+      for (let line of lines) {
+        line = line.trim();
+        if (line === "") {
+          if (!lastLineEmpty) {
+            formattedLines.push("");
+            lastLineEmpty = true;
+          }
+          continue;
+        }
+        
+        lastLineEmpty = false;
+        
+        // Basic Markdown header formatting heuristics
+        if (line.length > 3 && line.length < 60 && line === line.toUpperCase() && !line.match(/^[0-9\s\W]+$/)) {
+          formattedLines.push(`## ${line}`);
+        } else {
+          formattedLines.push(line);
+        }
+      }
+      resultText = formattedLines.join("\n");
+    }
+    
+    const outputName = basename(inputPath).replace(/\.[^.]+$/, `.${targetExt}`);
+    const outputPath = `${outDir}${outputName}`;
+    await writeFile(outputPath, resultText, "utf8");
+    return outputPath;
+  }
 
   const args = [
     "--headless",

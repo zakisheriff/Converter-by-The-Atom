@@ -133,6 +133,16 @@ export default function ConversionCard({ fileItem, onRemove, onComplete, activeA
       } else if (targets.includes("png")) {
         setTargetFormat("png");
       }
+    } else if (activeAction === "to-word") {
+      if (targets.includes("docx")) setTargetFormat("docx");
+      else if (targets.includes("doc")) setTargetFormat("doc");
+    } else if (activeAction === "to-images") {
+      if (targets.includes("png")) setTargetFormat("png");
+      else if (targets.includes("jpg")) setTargetFormat("jpg");
+    } else if (activeAction === "to-text") {
+      if (targets.includes("txt")) setTargetFormat("txt");
+    } else if (activeAction === "to-markdown") {
+      if (targets.includes("md")) setTargetFormat("md");
     }
   }, [activeAction, targets]);
 

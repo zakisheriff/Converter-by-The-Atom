@@ -24,7 +24,7 @@ export const formatCategories = {
       { ext: "md", mime: "text/markdown", label: "Markdown" },
       { ext: "pages", mime: "application/x-iwork-pages-sffpages", label: "Pages" },
     ],
-    targets: ["pdf", "docx", "doc", "odt", "rtf", "txt", "html", "epub", "mobi"]
+    targets: ["pdf", "docx", "doc", "odt", "rtf", "txt", "html", "epub", "mobi", "md"]
   },
   spreadsheet: {
     label: "Spreadsheets",

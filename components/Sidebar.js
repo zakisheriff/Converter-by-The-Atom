@@ -14,7 +14,10 @@ import {
   SlidersHorizontal,
   X,
   Coffee,
-  BookOpen
+  BookOpen,
+  QrCode,
+  Sparkles,
+  Maximize
 } from "lucide-react";
 import { GlassButton } from "@zakisheriff/liquid-glass";
 import styles from "@/components/Sidebar.module.css";
@@ -27,6 +30,9 @@ const navigation = [
   { label: "Audio Tools", href: "/audio-tools", icon: Music },
   { label: "Archive Tools", href: "/archive-tools", icon: Archive },
   { label: "Website Capture", href: "/website-capture", icon: Globe },
+  { label: "QR Generator", href: "/qr-generator", icon: QrCode },
+  { label: "Watermark Remover", href: "/watermark-remover", icon: Sparkles },
+  { label: "Image Upscaler", href: "/image-upscaler", icon: Maximize },
   { label: "How it works", href: "/blog", icon: BookOpen },
 ];
 

@@ -7,6 +7,7 @@ import {
   Image,
   Scissors,
   Lock,
+  FileCode,
 } from "lucide-react";
 import ToolPageShell from "@/components/ToolPageShell";
 
@@ -15,6 +16,8 @@ const quickActions = [
   { key: "compress", label: "Compress", icon: Minimize2 },
   { key: "to-word", label: "PDF → Word", icon: FileText },
   { key: "to-images", label: "PDF → Images", icon: Image },
+  { key: "to-text", label: "PDF → Text", icon: FileText },
+  { key: "to-markdown", label: "PDF → Markdown", icon: FileCode },
   { key: "split", label: "Split", icon: Scissors },
   { key: "protect", label: "Protect", icon: Lock },
 ];

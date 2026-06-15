@@ -29,9 +29,33 @@ export default function ImageUpscalerPage() {
     };
   }, []);
 
+  const [isDragging, setIsDragging] = useState(false);
+
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
+    const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      setFile(selectedFile);
+      setPreviewUrl(URL.createObjectURL(selectedFile));
+      setResult(null);
+      setError(null);
+      setProgress(0);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const selectedFile = e.dataTransfer?.files?.[0];
+    if (selectedFile && selectedFile.type.startsWith("image/")) {
       setFile(selectedFile);
       setPreviewUrl(URL.createObjectURL(selectedFile));
       setResult(null);
@@ -135,7 +159,10 @@ export default function ImageUpscalerPage() {
 
             {!file ? (
               <div
-                className={styles.uploadArea}
+                className={`${styles.uploadArea} ${isDragging ? styles.uploadAreaActive : ""}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload size={40} className={styles.uploadIcon} />

@@ -61,9 +61,36 @@ export default function WatermarkRemoverPage() {
     };
   }, [image]);
 
+  const [isDragging, setIsDragging] = useState(false);
+
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
+      setImageName(file.name);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImage(event.target.result);
+        setOriginalImageSrc(event.target.result);
+        setHasWatermarkRemoved(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer?.files?.[0];
+    if (file && file.type.startsWith("image/")) {
       setImageName(file.name);
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -97,7 +124,27 @@ export default function WatermarkRemoverPage() {
   const startDrawing = (e) => {
     e.preventDefault();
     setIsDrawing(true);
-    draw(e);
+    
+    const maskCanvas = maskCanvasRef.current;
+    const maskCtx = maskCanvas?.getContext("2d");
+    if (maskCanvas && maskCtx) {
+      maskCtx.beginPath();
+      const { x, y } = getCanvasMousePos(e);
+      maskCtx.moveTo(x, y);
+      
+      // Draw immediate dot
+      maskCtx.lineWidth = brushSize * (maskCanvas.width / maskCanvas.getBoundingClientRect().width);
+      maskCtx.lineCap = "round";
+      maskCtx.lineJoin = "round";
+      if (tool === "brush") {
+        maskCtx.strokeStyle = "rgba(239, 68, 68, 0.6)";
+        maskCtx.globalCompositeOperation = "source-over";
+      } else {
+        maskCtx.globalCompositeOperation = "destination-out";
+      }
+      maskCtx.lineTo(x, y);
+      maskCtx.stroke();
+    }
   };
 
   const stopDrawing = () => {
@@ -300,7 +347,10 @@ export default function WatermarkRemoverPage() {
 
             {!image ? (
               <div
-                className={styles.uploadArea}
+                className={`${styles.uploadArea} ${isDragging ? styles.uploadAreaActive : ""}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Upload size={40} className={styles.uploadIcon} />

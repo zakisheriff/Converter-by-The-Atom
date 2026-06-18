@@ -1,0 +1,8 @@
+rembg
+onnxruntime
+torch
+torchvision
+simple-lama-inpainting
+opencv-python-headless
+pillow
+numpy

@@ -24,6 +24,17 @@ export default function WatermarkRemoverPage() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0, displayWidth: 0, displayHeight: 0 });
   const [originalImageSrc, setOriginalImageSrc] = useState(null);
+  const [error, setError] = useState(null);
+  const [cleanedImageUrl, setCleanedImageUrl] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+
+  const pollRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
 
   // Load image onto Canvas
   useEffect(() => {
@@ -67,11 +78,14 @@ export default function WatermarkRemoverPage() {
     const file = e.target.files?.[0];
     if (file) {
       setImageName(file.name);
+      setImageFile(file);
       const reader = new FileReader();
       reader.onload = (event) => {
         setImage(event.target.result);
         setOriginalImageSrc(event.target.result);
         setHasWatermarkRemoved(false);
+        setCleanedImageUrl(null);
+        setError(null);
       };
       reader.readAsDataURL(file);
     }
@@ -92,11 +106,14 @@ export default function WatermarkRemoverPage() {
     const file = e.dataTransfer?.files?.[0];
     if (file && file.type.startsWith("image/")) {
       setImageName(file.name);
+      setImageFile(file);
       const reader = new FileReader();
       reader.onload = (event) => {
         setImage(event.target.result);
         setOriginalImageSrc(event.target.result);
         setHasWatermarkRemoved(false);
+        setCleanedImageUrl(null);
+        setError(null);
       };
       reader.readAsDataURL(file);
     }
@@ -202,134 +219,101 @@ export default function WatermarkRemoverPage() {
         }
         handleClearMask();
         setHasWatermarkRemoved(false);
+        setCleanedImageUrl(null);
+        setError(null);
       };
     }
   };
 
-  // Run in-painting watermark remover
-  const handleRemoveWatermark = () => {
+  // Run AI in-painting (LaMa model) to remove the masked watermark on the server
+  const handleRemoveWatermark = async () => {
     const imgCanvas = imageCanvasRef.current;
     const maskCanvas = maskCanvasRef.current;
-    if (!imgCanvas || !maskCanvas) return;
+    if (!imgCanvas || !maskCanvas || !imageFile) return;
+
+    // Verify a mask has actually been drawn
+    const maskCtx = maskCanvas.getContext("2d");
+    const maskData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height).data;
+    let hasMaskPixels = false;
+    for (let i = 3; i < maskData.length; i += 4) {
+      if (maskData[i] > 10) {
+        hasMaskPixels = true;
+        break;
+      }
+    }
+    if (!hasMaskPixels) return;
 
     setIsProcessing(true);
+    setError(null);
 
-    // Run in timeout to allow loader UI to show
-    setTimeout(() => {
-      try {
-        const width = imgCanvas.width;
-        const height = imgCanvas.height;
-        const imgCtx = imgCanvas.getContext("2d");
-        const maskCtx = maskCanvas.getContext("2d");
+    try {
+      const maskBlob = await new Promise((resolve) => maskCanvas.toBlob(resolve, "image/png"));
 
-        const imgData = imgCtx.getImageData(0, 0, width, height);
-        const maskData = maskCtx.getImageData(0, 0, width, height);
-        
-        const pixels = imgData.data;
-        const mask = maskData.data;
+      const formData = new FormData();
+      formData.append("file", imageFile);
+      formData.append("mask", maskBlob, "mask.png");
 
-        // Perform spatial neighborhood interpolation to fill mask
-        const len = pixels.length;
-        const isMasked = new Uint8Array(len / 4);
-        let hasMaskPixels = false;
+      const res = await fetch("/api/watermark-remover", {
+        method: "POST",
+        body: formData,
+      });
 
-        for (let i = 0; i < len; i += 4) {
-          if (mask[i + 3] > 10) {
-            isMasked[i / 4] = 1;
-            hasMaskPixels = true;
-          }
-        }
-
-        if (!hasMaskPixels) {
-          setIsProcessing(false);
-          return;
-        }
-
-        const maxPasses = 8;
-        const radius = 6;
-        let passes = 0;
-        let unresolved = true;
-
-        while (unresolved && passes < maxPasses) {
-          passes++;
-          unresolved = false;
-          const resolvedThisPass = [];
-
-          for (let pIdx = 0; pIdx < isMasked.length; pIdx++) {
-            if (isMasked[pIdx] === 0) continue;
-
-            const x = pIdx % width;
-            const y = Math.floor(pIdx / width);
-
-            let rSum = 0, gSum = 0, bSum = 0, wSum = 0;
-
-            // Search neighborhood
-            for (let dy = -radius; dy <= radius; dy++) {
-              for (let dx = -radius; dx <= radius; dx++) {
-                const nx = x + dx;
-                const ny = y + dy;
-                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                  const npIdx = ny * width + nx;
-                  if (isMasked[npIdx] === 0) {
-                    const distSq = dx * dx + dy * dy;
-                    if (distSq <= radius * radius) {
-                      const dist = Math.sqrt(distSq) || 0.1;
-                      const weight = 1.0 / (dist * dist);
-                      const nI = npIdx * 4;
-                      rSum += pixels[nI] * weight;
-                      gSum += pixels[nI + 1] * weight;
-                      bSum += pixels[nI + 2] * weight;
-                      wSum += weight;
-                    }
-                  }
-                }
-              }
-            }
-
-            if (wSum > 0) {
-              resolvedThisPass.push({
-                idx: pIdx,
-                r: rSum / wSum,
-                g: gSum / wSum,
-                b: bSum / wSum
-              });
-            } else {
-              unresolved = true; // Still has pixels with no resolved neighbors
-            }
-          }
-
-          // Apply updates
-          for (const item of resolvedThisPass) {
-            const i = item.idx * 4;
-            pixels[i] = item.r;
-            pixels[i + 1] = item.g;
-            pixels[i + 2] = item.b;
-            isMasked[item.idx] = 0;
-          }
-
-          if (resolvedThisPass.length === 0) {
-            break; // Avoid infinite loop if completely stuck
-          }
-        }
-
-        imgCtx.putImageData(imgData, 0, 0);
-        handleClearMask();
-        setHasWatermarkRemoved(true);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsProcessing(false);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Watermark removal failed");
       }
-    }, 100);
+
+      const data = await res.json();
+
+      await new Promise((resolve, reject) => {
+        pollRef.current = setInterval(async () => {
+          try {
+            const pollRes = await fetch(data.statusUrl);
+            if (!pollRes.ok) return;
+            const pollData = await pollRes.json();
+
+            if (pollData.status === "done") {
+              clearInterval(pollRef.current);
+              resolve(pollData);
+            } else if (pollData.status === "error") {
+              clearInterval(pollRef.current);
+              reject(new Error(pollData.error || "Watermark removal failed"));
+            }
+          } catch (e) {
+            // ignore transient poll errors
+          }
+        }, 1000);
+      }).then(async (pollData) => {
+        const imgRes = await fetch(pollData.downloadUrl);
+        const blob = await imgRes.blob();
+        const objectUrl = URL.createObjectURL(blob);
+
+        const cleanImg = new Image();
+        cleanImg.src = objectUrl;
+        await new Promise((resolve) => {
+          cleanImg.onload = resolve;
+        });
+
+        const imgCtx = imgCanvas.getContext("2d");
+        imgCtx.clearRect(0, 0, imgCanvas.width, imgCanvas.height);
+        imgCtx.drawImage(cleanImg, 0, 0, imgCanvas.width, imgCanvas.height);
+
+        handleClearMask();
+        setCleanedImageUrl(objectUrl);
+        setHasWatermarkRemoved(true);
+      });
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Watermark removal failed");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleDownload = () => {
-    const imgCanvas = imageCanvasRef.current;
-    if (!imgCanvas) return;
-
-    const dataUrl = imgCanvas.toDataURL("image/png");
+    if (!cleanedImageUrl) return;
     const a = document.createElement("a");
-    a.href = dataUrl;
+    a.href = cleanedImageUrl;
     a.download = imageName.replace(/\.[^.]+$/, "_clean.png");
     document.body.appendChild(a);
     a.click();
@@ -342,7 +326,7 @@ export default function WatermarkRemoverPage() {
         <LiquidGlassFilter>
           <div className={styles.page}>
             <p className={styles.description}>
-              Erase watermarks, logos, timestamps, or unwanted objects from your images. Select a photo, brush over the watermark, and hit Remove.
+              Erase watermarks, logos, timestamps, or unwanted objects from your images using AI-powered inpainting (LaMa). Select a photo, brush over the watermark, and hit Remove for a seamless, photorealistic result.
             </p>
 
             {!image ? (
@@ -428,7 +412,7 @@ export default function WatermarkRemoverPage() {
                     {isProcessing ? (
                       <>
                         <RefreshCw size={16} className={styles.spin} />
-                        Erasing...
+                        AI Erasing...
                       </>
                     ) : (
                       <>
@@ -437,6 +421,12 @@ export default function WatermarkRemoverPage() {
                       </>
                     )}
                   </GlassButton>
+
+                  {error && (
+                    <div className={styles.errorBanner}>
+                      <span>{error}</span>
+                    </div>
+                  )}
 
                   {hasWatermarkRemoved && (
                     <GlassButton

@@ -23,10 +23,13 @@ RUN sed -i 's/<policy domain="coder" rights="none" pattern="PDF"/<policy domain=
 WORKDIR /app
 
 # Copy dependency files
-COPY package*.json ./
+COPY package*.json requirements.txt ./
 
 # Install npm dependencies
 RUN npm ci
+
+# Install Python dependencies for AI-powered background/watermark removal
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 
 # Copy the rest of the application
 COPY . .

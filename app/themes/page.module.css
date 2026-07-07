@@ -1,0 +1,471 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px 64px;
+}
+
+.description {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 760px;
+}
+
+/* Filter Controls */
+.filterBar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--surface-soft-card);
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--surface-soft-shadow);
+  backdrop-filter: blur(16px);
+}
+
+.searchContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 16px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 14px 16px 14px 46px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--field-bg);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  box-shadow: var(--field-shadow);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  border-color: var(--text-primary);
+  box-shadow: var(--field-focus-shadow);
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.categoryBtn {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--surface-chip-bg);
+  color: var(--text-secondary);
+  box-shadow: var(--surface-chip-shadow);
+  transition: all 0.2s ease;
+}
+
+.categoryBtnActive {
+  background: var(--button-bg);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: var(--button-shadow);
+}
+
+/* Theme Cards Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 28px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  overflow: hidden;
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cardInner {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.themeName {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.categoryBadge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: var(--primary-soft);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.themeDesc {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Visual Mock Layout Grid */
+.mockLayoutFrame {
+  height: 140px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+
+.mockNavbar {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mockLogo {
+  width: 25px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.mockNavLinks {
+  display: flex;
+  gap: 4px;
+}
+
+.mockNavLink {
+  width: 12px;
+  height: 4px;
+  border-radius: 2px;
+  opacity: 0.4;
+}
+
+.mockHero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  position: relative;
+}
+
+.mockHeroTitle {
+  width: 60%;
+  height: 12px;
+  border-radius: 4px;
+}
+
+.mockHeroSubtitle {
+  width: 40%;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.mockHeroCTA {
+  width: 30px;
+  height: 10px;
+  border-radius: 5px;
+}
+
+.mockBento {
+  position: absolute;
+  bottom: 4px;
+  left: 8px;
+  right: 8px;
+  height: 35px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 4px;
+}
+
+.mockBentoCell {
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Specs (Colors & Fonts) */
+.specs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+}
+
+.specRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.8rem;
+}
+
+.specLabel {
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.specValue {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-family: var(--font-mono), monospace;
+}
+
+.palette {
+  display: flex;
+  gap: 6px;
+}
+
+.swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: rgba(12, 12, 12, 0.04);
+  padding: 3px 8px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+}
+
+.exploreBtn {
+  margin-top: auto;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Modal details container */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 800px;
+  max-height: 85vh;
+  border-radius: 28px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.24);
+  animation: modalEnter 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalHeader {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface-strong);
+}
+
+.modalTitleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: var(--font-display), sans-serif;
+  color: var(--text-primary);
+}
+
+.modalMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.closeBtn {
+  border: none;
+  background: transparent;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.closeBtn:hover {
+  background: var(--primary-soft);
+  color: var(--text-primary);
+  transform: rotate(90deg);
+}
+
+.modalBody {
+  padding: 28px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.modalIntro {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.promptCard {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--surface-soft-card);
+}
+
+.promptHeader {
+  padding: 12px 18px;
+  background: rgba(12, 12, 12, 0.02);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.promptTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+}
+
+.copyButton {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.promptPre {
+  margin: 0;
+  padding: 16px 18px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  font-family: var(--font-mono), monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modalOverlay {
+    padding: 12px;
+  }
+  
+  .modalContent {
+    max-height: 95vh;
+  }
+
+  .modalHeader {
+    padding: 16px 20px;
+  }
+
+  .modalBody {
+    padding: 20px;
+  }
+}

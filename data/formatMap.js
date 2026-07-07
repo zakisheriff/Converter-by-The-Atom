@@ -174,7 +174,8 @@ export function getTargetsForExt(ext) {
   const categoryKey = getCategoryForExt(normalized);
   if (!categoryKey) return [];
   const cat = formatCategories[categoryKey];
-  return cat.targets.filter((t) => t !== normalized);
+  const cleanExt = ext.replace(/^\./, "");
+  return cat.targets.filter((t) => t !== cleanExt);
 }
 
 /**

@@ -51,7 +51,7 @@ export default function FormatPicker({ sourceExt, selected, onSelect }) {
                     className={`${styles.chip} ${isActive ? styles.chipActive : ""}`}
                     onClick={() => onSelect(ext)}
                   >
-                    {info.label}
+                    {ext}
                   </button>
                 );
               })}

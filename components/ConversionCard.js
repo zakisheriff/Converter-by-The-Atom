@@ -108,6 +108,7 @@ function formatSize(bytes) {
 
 export default function ConversionCard({ fileItem, onRemove, onComplete, activeAction }) {
   const { file, name, size, ext } = fileItem;
+  const originalExt = name.split(".").pop();
   const Icon = getFileIcon(ext);
   const categoryKey = getCategoryForExt(ext);
 
@@ -306,7 +307,7 @@ export default function ConversionCard({ fileItem, onRemove, onComplete, activeA
         <div className={styles.fileCopy}>
           <strong className={styles.fileName}>{name}</strong>
           <span className={styles.fileMeta}>
-            {formatSize(size)} &middot; {ext.toUpperCase()}
+            {formatSize(size)} &middot; {originalExt}
           </span>
         </div>
         {onRemove && !jobState && (
@@ -335,7 +336,7 @@ export default function ConversionCard({ fileItem, onRemove, onComplete, activeA
           <div className={styles.resultInfo}>
             <ArrowRight size={16} className={styles.arrowIcon} />
             <span className={styles.resultFormat}>
-              .{ext.toUpperCase()} → .{targetFormat.toUpperCase()}
+              .{originalExt} → .{targetFormat}
             </span>
           </div>
           <div className={styles.resultActions}>
@@ -395,7 +396,7 @@ export default function ConversionCard({ fileItem, onRemove, onComplete, activeA
               className={styles.convertBtn}
               disabled={!targetFormat}
             >
-              Convert to {targetFormat.toUpperCase()}
+              Convert to {targetFormat}
             </GlassButton>
           </div>
         </>

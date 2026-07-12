@@ -90,10 +90,11 @@ export const metadata = {
   alternates: { canonical: "/" },
   icons: {
     icon: [
-      { url: "/converter-logo.png", type: "image/png" },
+      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/icon.png", type: "image/png" },
     ],
-    shortcut: ["/converter-logo.png"],
-    apple: [{ url: "/converter-logo.png", sizes: "512x512", type: "image/png" }],
+    shortcut: ["/favicon.ico"],
+    apple: [{ url: "/icon.png", sizes: "512x512", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
   openGraph: {

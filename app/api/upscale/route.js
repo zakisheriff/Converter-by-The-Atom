@@ -21,6 +21,30 @@ function runCommand(cmd, args) {
 }
 
 export async function POST(request) {
+  const backendUrl = process.env.CONVERSION_BACKEND_URL;
+  if (backendUrl) {
+    try {
+      const url = new URL(request.url);
+      const targetUrl = `${backendUrl.replace(/\/$/, "")}${url.pathname}${url.search}`;
+      const contentType = request.headers.get("content-type") || "";
+      let body;
+      if (contentType.includes("application/json")) {
+        body = JSON.stringify(await request.json());
+      } else {
+        body = await request.formData();
+      }
+      const response = await fetch(targetUrl, {
+        method: "POST",
+        body,
+        headers: contentType.includes("application/json") ? { "Content-Type": "application/json" } : undefined
+      });
+      const data = await response.json();
+      return NextResponse.json(data, { status: response.status });
+    } catch (err) {
+      return NextResponse.json({ error: "Backend proxy error: " + err.message }, { status: 502 });
+    }
+  }
+
   try {
     const formData = await request.formData();
     const file = formData.get("file");
